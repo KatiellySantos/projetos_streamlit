@@ -615,7 +615,7 @@ Este relatório apresenta gráficos e análises detalhadas para apoiar decisões
                     plt.savefig(tmp.name, bbox_inches="tight")
                     plt.close()
                     story.append(RLImage(tmp.name, width=5*inch, height=3.5*inch))
-               else:
+                else:
                    story.append(Paragraph("Não foi possível gerar gráfico.", styles["Normal"]))
            story.append(Spacer(1, 1))
 
