@@ -617,18 +617,18 @@ Este relatório apresenta gráficos e análises detalhadas para apoiar decisões
                     story.append(RLImage(tmp.name, width=5*inch, height=3.5*inch))
                 else:
                    story.append(Paragraph("Não foi possível gerar gráfico.", styles["Normal"]))
-           story.append(Spacer(1, 1))
+            story.append(Spacer(1, 1))
 
-           if descricao:
-               story.append(Paragraph(descricao, styles["Normal"]))
-               story.append(Spacer(1, 1))
+            if descricao:
+                story.append(Paragraph(descricao, styles["Normal"]))
+                story.append(Spacer(1, 1))
 
-           if markdown_dinamico:
-              for linha in markdown_dinamico.split("\n"):
-                  if linha.strip():
-                      linha_formatada = linha.replace("**", "")
-                      story.append(Paragraph(linha_formatada, styles["Normal"]))
-              story.append(Spacer(1, 14))
+            if markdown_dinamico:
+               for linha in markdown_dinamico.split("\n"):
+                   if linha.strip():
+                       linha_formatada = linha.replace("**", "")
+                       story.append(Paragraph(linha_formatada, styles["Normal"]))
+               story.append(Spacer(1, 14))
 
 
 
