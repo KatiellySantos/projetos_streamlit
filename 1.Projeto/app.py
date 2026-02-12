@@ -473,9 +473,9 @@ with tab3:
         story = []  # story definido aqui, dentro do if
 
         # ----- TÍTULO PDF -----
-        logo = Image("IBGE.PNG", width=60, height=60)
-        story.append(logo)
-        story.append(Spacer(1, 1))
+     #   logo = Image("IBGE.PNG", width=60, height=60)
+     #   story.append(logo)
+     #   story.append(Spacer(1, 1))
 
         story.append(Paragraph(
             "<b>Painel de Desenvolvimento Econômico e Turístico</b>",
@@ -636,16 +636,16 @@ Este relatório apresenta gráficos e análises detalhadas para apoiar decisões
                          texto_arr, markdown_arrecadacao)
 
         # ----- Logo e assinatura -----
-        logo_final = Image("logo.png", width=60, height=60)
-        assinatura = Table([[ '', logo_final ]], colWidths=[400, 60])
-        assinatura.setStyle(TableStyle([
-            ('VALIGN', (0, 0), (-1, -1), 'BOTTOM'),
-            ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
-            ('ALIGN', (0, 0), (0, 0), 'LEFT')
-        ]))
-        story.append(Spacer(1, 20))
-        story.append(assinatura)
-        story.append(Spacer(1, 20))
+        #logo_final = Image("logo.png", width=60, height=60)
+        #assinatura = Table([[ '', logo_final ]], colWidths=[400, 60])
+        #assinatura.setStyle(TableStyle([
+            #('VALIGN', (0, 0), (-1, -1), 'BOTTOM'),
+            #('ALIGN', (1, 0), (1, 0), 'RIGHT'),
+            #('ALIGN', (0, 0), (0, 0), 'LEFT')
+        #]))
+        #story.append(Spacer(1, 20))
+        #story.append(assinatura)
+        #story.append(Spacer(1, 20))
 
         # ----- Gerar PDF -----
         tmp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
