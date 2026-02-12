@@ -11,22 +11,15 @@ import json
 from datetime import datetime
 import tempfile
 import os
-import matplotlib.pyplot as plt
-import tempfile
 
 # reportlab para montar PDF
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, Table, TableStyle
-from reportlab.platypus import Image as RLImage
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import inch
 from reportlab.lib import colors
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.enums import TA_RIGHT
-
-import plotly.io as pio
-pio.kaleido.scope.default_format = "png"
-
 
 # ---------- CONFIG PAGE ----------
 st.set_page_config(
@@ -37,10 +30,7 @@ st.set_page_config(
 )
 
 # ---------- LEITURA DO ARQUIVO ----------
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-arquivo = os.path.join(BASE_DIR, "planilha.xlsx")
-
-df = pd.read_excel(arquivo)
+df = pd.read_excel("planilha.xlsx")
 
 # ---------- TÍTULO (HTML/CSS) ----------
 st.markdown("""
@@ -344,8 +334,7 @@ with tab1:
             "</h5>",
             unsafe_allow_html=True
         )
-        geojson_path = os.path.join(BASE_DIR, "mapa.json")
-        with open(geojson_path, "r", encoding="utf-8") as f:
+        with open("mapa.geojson", "r", encoding="utf-8") as f:
             geojson_mapa = json.load(f)
         df_filtrado["codigo_ibge"] = df_filtrado["codigo_ibge"].astype(str)
         df_filtrado["Visitas_hover"] = df_filtrado["Visitas"].apply(
@@ -416,8 +405,7 @@ with tab2:
             "</h5>",
             unsafe_allow_html=True
         )
-        geojson_path = os.path.join(BASE_DIR, "mapa.json")
-        with open(geojson_path, "r", encoding="utf-8") as f: 
+        with open("mapa.geojson", "r", encoding="utf-8") as f:
             geojson_mapa = json.load(f)
         df_filtrado["codigo_ibge"] = df_filtrado["codigo_ibge"].astype(str)
         df_filtrado["Arrecadacao_hover"] = df_filtrado["Arrecadação"].apply(
@@ -465,10 +453,9 @@ with tab3:
         story = []  # story definido aqui, dentro do if
 
         # ----- TÍTULO PDF -----
-        #ibge_path = os.path.join(BASE_DIR, "IBGE.PNG")
-        #logo = Image(ibge_path, width=60, height=60)
-        #story.append(logo)
-        #story.append(Spacer(1, 1))
+        logo = Image("IBGE.PNG", width=60, height=60)
+        story.append(logo)
+        story.append(Spacer(1, 1))
 
         story.append(Paragraph(
             "<b>Painel de Desenvolvimento Econômico e Turístico</b>",
@@ -597,39 +584,26 @@ Este relatório apresenta gráficos e análises detalhadas para apoiar decisões
         )
 
         # ----- Função para salvar gráfico e inserir markdown -----
-        def salvar_e_inserir(fig, titulo, descricao, markdown_dinamico=None, df=None, coluna_x=None, coluna_y=None):
-            from reportlab.platypus import Image as RLImage
-            import matplotlib
-            matplotlib.use('Agg')
-            import matplotlib.pyplot as plt
-            import tempfile
-
+        def salvar_e_inserir(fig, titulo, descricao, markdown_dinamico=None):
             story.append(Paragraph(f"<b>{titulo}</b>", titulo_menor))
-
-            
-            tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
-            png_bytes = fig.to_image(format="png")
-            with open(tmp.name, "wb") as f:
-                f.write(png_bytes)
-            story.append(RLImage(tmp.name, width=5*inch, height=3.5*inch))
-       
+            try:
+                tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
+                fig.write_image(tmp.name, scale=2)
+                story.append(Image(tmp.name, width=5*inch, height=3.5*inch))
+                story.append(Spacer(1, 1))
+            except Exception as e:
+                story.append(Paragraph(f"Erro ao salvar gráfico: {e}", styles["Normal"]))
 
             if descricao:
                 story.append(Paragraph(descricao, styles["Normal"]))
                 story.append(Spacer(1, 1))
 
             if markdown_dinamico:
-               for linha in markdown_dinamico.split("\n"):
-                   if linha.strip():
-                       linha_formatada = linha.replace("**", "")
-                       story.append(Paragraph(linha_formatada, styles["Normal"]))
-               story.append(Spacer(1, 14))
-
-
-
-
-        
-  
+                for linha in markdown_dinamico.split("\n"):
+                    if linha.strip():
+                        linha_formatada = linha.replace("**", "")
+                        story.append(Paragraph(linha_formatada, styles["Normal"]))
+                story.append(Spacer(1, 14))
 
         # ----- Inserir gráficos + markdowns -----
         salvar_e_inserir(fig_barras, "Quantidade de empregos por Estado",
@@ -642,17 +616,16 @@ Este relatório apresenta gráficos e análises detalhadas para apoiar decisões
                          texto_arr, markdown_arrecadacao)
 
         # ----- Logo e assinatura -----
-        #logo_path = os.path.join(BASE_DIR, "logo.png")
-        #logo_final = Image(logo_path, width=60, height=60)
-        #assinatura = Table([[ '', logo_final ]], colWidths=[400, 60])
-        #assinatura.setStyle(TableStyle([
-         #   ('VALIGN', (0, 0), (-1, -1), 'BOTTOM'),
-          #  ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
-           # ('ALIGN', (0, 0), (0, 0), 'LEFT')
-       # ]))
-       # story.append(Spacer(1, 20))
-        #story.append(assinatura)
-        #story.append(Spacer(1, 20))
+        logo_final = Image("logo.png", width=60, height=60)
+        assinatura = Table([[ '', logo_final ]], colWidths=[400, 60])
+        assinatura.setStyle(TableStyle([
+            ('VALIGN', (0, 0), (-1, -1), 'BOTTOM'),
+            ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
+            ('ALIGN', (0, 0), (0, 0), 'LEFT')
+        ]))
+        story.append(Spacer(1, 20))
+        story.append(assinatura)
+        story.append(Spacer(1, 20))
 
         # ----- Gerar PDF -----
         tmp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
