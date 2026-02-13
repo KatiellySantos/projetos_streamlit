@@ -11,6 +11,7 @@ import json
 from datetime import datetime
 import tempfile
 import os
+import matplotlib.pyplot as plt
 
 # reportlab para montar PDF
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, Table, TableStyle
