@@ -567,7 +567,7 @@ fluxo de visitantes e arrecadação turística.
         def grafico_linha(df, coluna, titulo):
             df_uf = df.groupby("Estado", as_index=False)[coluna].sum()
 
-            fig, ax = plt.subplots(figsize=(6,3))
+            fig, ax = plt.subplots(figsize=(4,2))
             ax.plot(df_uf["Estado"], df_uf[coluna], marker="o")
             ax.set_title(titulo)
             plt.xticks(rotation=45)
