@@ -469,9 +469,13 @@ with tab3:
 
     if gerar:
         msg = st.info("⏳ Gerando relatório, por favor aguarde...")
+        try:
+            pio.kaleido.scope.default_format = "png"
+        except:
+            pass
 
         styles = getSampleStyleSheet()
-        story = []
+        story = []  # story definido aqui, dentro do if
 
         # ----- TÍTULO PDF -----
         ibge_path = os.path.join(BASE_DIR, "IBGE.png")
@@ -484,7 +488,7 @@ with tab3:
             "<b>Painel de Desenvolvimento Econômico e Turístico</b>",
             styles["Title"]
         ))
-
+        
         agora = datetime.now(ZoneInfo("America/Sao_Paulo"))
         data_formatada = agora.strftime("%d/%m/%Y %H:%M")
         styles.add(ParagraphStyle(
@@ -607,42 +611,41 @@ Este relatório apresenta gráficos e análises detalhadas para apoiar decisões
             spaceAfter=10
         )
 
-        # ----- Função para salvar gráfico e inserir markdown (corrigido para horizontal) -----
+        # ----- Função para salvar gráfico e inserir markdown (MATPLOTLIB, sem Kaleido) -----
+        import matplotlib.pyplot as plt
+        import numpy as np
+
         def salvar_e_inserir(fig, titulo, descricao, markdown_dinamico=None):
             story.append(Paragraph(f"<b>{titulo}</b>", titulo_menor))
             try:
                 tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
                 plt.figure(figsize=(8, 5))
 
-                # Detectar barras horizontais ou verticais
-                if hasattr(fig.data[0], 'orientation') and fig.data[0].orientation == 'h':
-                    # Horizontal
-                    y = fig.data[0].y
-                    x = fig.data[0].x
-                    plt.barh(y, x)
-                    plt.xlabel("Quantidade")
-                    plt.ylabel("Estados")
-                else:
-                    # Vertical
-                    if len(fig.data) == 2:
-                        x = fig.data[0].x
-                        y1 = fig.data[0].y
-                        y2 = fig.data[1].y
-                        largura = 0.35
-                        pos = np.arange(len(x))
-                        plt.bar(pos - largura/2, y1, largura, label=fig.data[0].name or "")
-                        plt.bar(pos + largura/2, y2, largura, label=fig.data[1].name or "")
-                        plt.xticks(pos, x, rotation=45)
-                        plt.legend()
-                    else:
-                        x = fig.data[0].x
-                        y = fig.data[0].y
-                        plt.bar(x, y)
-                        plt.xticks(rotation=45)
+                # Detecta tipo de gráfico Plotly
+                if len(fig.data) == 1:
+                    trace = fig.data[0]
+                    if trace.type == "scatter":
+                        plt.plot(trace.x, trace.y, marker='o')
+                    elif trace.type == "bar":
+                        plt.bar(trace.x, trace.y)
+                elif len(fig.data) == 2:
+                    trace1 = fig.data[0]
+                    trace2 = fig.data[1]
+                    x = trace1.x
+                    y1 = trace1.y
+                    y2 = trace2.y
+                    largura = 0.35
+                    pos = np.arange(len(x))
+                    plt.bar(pos - largura/2, y1, largura, label=trace1.name if trace1.name else "")
+                    plt.bar(pos + largura/2, y2, largura, label=trace2.name if trace2.name else "")
+                    plt.xticks(pos, x)
+                    plt.legend()
 
+                plt.xticks(rotation=45)
                 plt.tight_layout()
                 plt.savefig(tmp.name, dpi=300)
                 plt.close()
+
                 story.append(Image(tmp.name, width=5*inch, height=3.5*inch))
                 story.append(Spacer(1, 6))
 
@@ -661,10 +664,14 @@ Este relatório apresenta gráficos e análises detalhadas para apoiar decisões
                 story.append(Spacer(1, 14))
 
         # ----- Inserir gráficos + markdowns -----
-        salvar_e_inserir(fig_barras, "Quantidade de empregos por Estado", texto_emp, markdown_empregos)
-        salvar_e_inserir(fig_barras_02, "Quantidade de estabelecimentos turísticos por Estado", texto_est, markdown_estabelecimentos)
-        salvar_e_inserir(fig_barrasVisitas, "Comparação entre visitas nacionais e internacionais", texto_vis, markdown_visitas)
-        salvar_e_inserir(fig_linhas, "Evolução da arrecadação turística", texto_arr, markdown_arrecadacao)
+        salvar_e_inserir(fig_barras, "Quantidade de empregos por Estado",
+                         texto_emp, markdown_empregos)
+        salvar_e_inserir(fig_barras_02, "Quantidade de estabelecimentos turísticos por Estado",
+                         texto_est, markdown_estabelecimentos)
+        salvar_e_inserir(fig_barrasVisitas, "Comparação entre visitas nacionais e internacionais",
+                         texto_vis, markdown_visitas)
+        salvar_e_inserir(fig_linhas, "Evolução da arrecadação turística",
+                         texto_arr, markdown_arrecadacao)
 
         # ----- Logo e assinatura -----
         logo_path = os.path.join(BASE_DIR, "logo.png")
