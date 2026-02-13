@@ -13,6 +13,8 @@ import tempfile
 import os
 import matplotlib.pyplot as plt
 
+
+
 # reportlab para montar PDF
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet
@@ -21,6 +23,7 @@ from reportlab.lib.units import inch
 from reportlab.lib import colors
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.enums import TA_RIGHT
+
 
 # ---------- CONFIG PAGE ----------
 st.set_page_config(
@@ -610,15 +613,18 @@ fluxo de visitantes e arrecadação turística.
             story.append(Spacer(1, 10))
 
             # Tamanho fixo controlado aqui
-            from reportlab.lib.units import inch
+       
 
-            from reportlab.platypus import Table
+         
 
-            img = Image(caminho_img, width=120, height=60)
+            img = Image(caminho_img, width=80, height=50)
 
-            tabela_img = Table([[img]], colWidths=[150])
+            tabela_img = Table([[img]], colWidths=[120])
+            tabela_img.setStyle(TableStyle([
+            ('ALIGN', (0,0), (-1,-1), 'CENTER')
+            ]))
+
             story.append(tabela_img)
-
      
 
            # os.unlink(caminho_img)
