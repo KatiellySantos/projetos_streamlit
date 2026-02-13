@@ -459,184 +459,161 @@ with tab2:
 # TAB 3 — RELATÓRIO PDF
 # ------------------------------------------------------------
 
-
+# ------------------------------------------------------------
+# TAB 3 — RELATÓRIO PDF COMPLETO (SEM KALEIDO)
+# ------------------------------------------------------------
 with tab3:
     st.subheader("Gerar Relatório")
     gerar = st.button("📄 Gerar Relatório em PDF")
 
     if gerar:
-        msg = st.info("⏳ Gerando relatório, por favor aguarde...")
 
-        import plotly.io as pio
-        import os
-        from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, Table, TableStyle
-        from reportlab.lib.pagesizes import A4
-        from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-        from reportlab.lib.enums import TA_RIGHT
-        from reportlab.lib.units import inch
-        from datetime import datetime
-        import tempfile
-
-        # --- Configurações Kaleido ---
-        os.environ["KALIEDO_BROWSER_PATH"] = "/usr/bin/chromium"
-        pio.kaleido.scope.default_format = "png"
-        pio.kaleido.scope.default_width = 800
-        pio.kaleido.scope.default_height = 600
-
-        # --- Styles para PDF ---
         styles = getSampleStyleSheet()
         story = []
 
-        # --- TÍTULO PDF ---
+        # ---------------- TÍTULO ----------------
         story.append(Paragraph(
             "<b>Painel de Desenvolvimento Econômico e Turístico</b>",
             styles["Title"]
         ))
 
         data_formatada = datetime.now().strftime("%d/%m/%Y %H:%M")
+
         styles.add(ParagraphStyle(
             name="DataDireita",
             parent=styles["Normal"],
             fontSize=8,
             alignment=TA_RIGHT
         ))
-        story.append(Paragraph(f"Gerado em: {data_formatada}", styles["DataDireita"]))
-        story.append(Spacer(1, 12))
 
-        # --- Texto de introdução ---
+        story.append(Paragraph(
+            f"Gerado em: {data_formatada}", styles["DataDireita"]
+        ))
+        story.append(Spacer(1, 14))
+
+        # ---------------- INTRODUÇÃO ----------------
         texto_intro = """
-Este relatório foi desenvolvido para fornecer uma visão completa sobre o desempenho dos polos turísticos, empregos, estabelecimentos e o nível de engajamento de visitantes nos municípios.
-A análise utiliza informações reais da base do IBGE, com o objetivo de avaliar tendências, padrões de comportamento e indicadores que influenciam a economia e o turismo local.
-Este relatório apresenta gráficos e análises detalhadas para apoiar decisões estratégicas e políticas públicas.
+Este relatório apresenta uma análise detalhada dos principais indicadores
+econômicos e turísticos com base nos filtros aplicados no painel.
+Os dados permitem avaliar a geração de empregos, estabelecimentos,
+fluxo de visitantes e arrecadação turística.
 """
         story.append(Paragraph(texto_intro, styles["Normal"]))
         story.append(Spacer(1, 18))
 
-        # --- Textos resumidos ---
-        texto_emp = "Os resultados observados indicam diferenças na geração de empregos."
-        texto_est = "A partir das informações levantadas, é possível identificar a quantidade de estabelecimentos turísticos."
-        texto_vis = "As informações disponíveis evidenciam o total de visitas."
-        texto_arr = "Os dados apresentados demonstram os valores de arrecadação registrados."
+        # ---------------- TEXTOS FIXOS ----------------
+        texto_emp = "Os resultados observados indicam diferenças na geração de empregos entre os estados analisados."
+        texto_est = "A partir das informações levantadas, é possível identificar a distribuição dos estabelecimentos turísticos."
+        texto_vis = "Os dados evidenciam o volume de visitas nacionais e internacionais registradas."
+        texto_arr = "Os valores apresentados demonstram o comportamento da arrecadação turística nos estados."
 
-        texto_kpi = "Os principais indicadores econômicos e turísticos por município são apresentados abaixo:"
-        story.append(Paragraph(texto_kpi, styles["Normal"]))
-        story.append(Spacer(1, 18))
+        # ---------------- FUNÇÕES DE TEXTO DINÂMICO ----------------
+        def texto_dinamico(df, coluna, prefixo):
+            df_uf = df.groupby("Estado", as_index=False)[coluna].sum()
+            linhas = []
+            for _, row in df_uf.iterrows():
+                valor = f"{int(row[coluna]):,}".replace(",", ".")
+                linhas.append(f"{prefixo} {row['Estado']} registrou {valor}.")
+            return linhas
 
-        # --- KPIs lado a lado ---
-        kpis = [
-            ["Total de Empregos", f"{total_empregos:,}".replace(',', '.')],
-            ["Estabelecimentos", f"{qtd_estabelecimentos:,}".replace(',', '.')],
-            ["Visitas Nacionais", f"{visitas_nac:,}".replace(',', '.')],
-            ["Visitas Internacionais", f"{visitas_int:,}".replace(',', '.')],
-            ["Arrecadação", f"R$ {arrecadacao:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')]
+        # ---------------- FUNÇÕES DE GRÁFICOS ----------------
+        def grafico_barra(df, coluna, titulo):
+            df_uf = df.groupby("Estado", as_index=False)[coluna].sum()
+
+            fig, ax = plt.subplots(figsize=(8,4))
+            ax.bar(df_uf["Estado"], df_uf[coluna])
+            ax.set_title(titulo)
+            plt.xticks(rotation=45)
+
+            tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
+            plt.tight_layout()
+            plt.savefig(tmp.name)
+            plt.close(fig)
+
+            return tmp.name
+
+        def grafico_visitas(df, titulo):
+            df_uf = df.groupby("Estado", as_index=False)[
+                ["Visitas Nacionais","Visitas Internacionais"]
+            ].sum()
+
+            fig, ax = plt.subplots(figsize=(8,4))
+            x = range(len(df_uf))
+
+            ax.bar(x, df_uf["Visitas Nacionais"], width=0.4, label="Nacionais")
+            ax.bar([i+0.4 for i in x], df_uf["Visitas Internacionais"], width=0.4, label="Internacionais")
+
+            ax.set_xticks([i+0.2 for i in x])
+            ax.set_xticklabels(df_uf["Estado"], rotation=45)
+            ax.legend()
+            ax.set_title(titulo)
+
+            tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
+            plt.tight_layout()
+            plt.savefig(tmp.name)
+            plt.close(fig)
+
+            return tmp.name
+
+        def grafico_linha(df, coluna, titulo):
+            df_uf = df.groupby("Estado", as_index=False)[coluna].sum()
+
+            fig, ax = plt.subplots(figsize=(8,4))
+            ax.plot(df_uf["Estado"], df_uf[coluna])
+            ax.set_title(titulo)
+            plt.xticks(rotation=45)
+
+            tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
+            plt.tight_layout()
+            plt.savefig(tmp.name)
+            plt.close(fig)
+
+            return tmp.name
+
+        # ---------------- SEÇÕES DO RELATÓRIO ----------------
+        secoes = [
+            ("Quantidade de empregos por Estado",
+             texto_emp,
+             grafico_barra(df_filtrado, "Empregos", "Quantidade de empregos por Estado"),
+             texto_dinamico(df_filtrado, "Empregos", "O estado de")),
+
+            ("Quantidade de estabelecimentos turísticos por Estado",
+             texto_est,
+             grafico_barra(df_filtrado, "Estabelecimentos", "Quantidade de estabelecimentos turísticos por Estado"),
+             texto_dinamico(df_filtrado, "Estabelecimentos", "No estado de")),
+
+            ("Comparação entre visitas nacionais e internacionais",
+             texto_vis,
+             grafico_visitas(df_filtrado, "Comparação entre visitas"),
+             texto_dinamico(df_filtrado, "Visitas Nacionais", "Em")),
+
+            ("Evolução da arrecadação turística",
+             texto_arr,
+             grafico_linha(df_filtrado, "Arrecadação", "Evolução da arrecadação turística"),
+             texto_dinamico(df_filtrado, "Arrecadação", "A arrecadação em"))
         ]
-        table_data = [[kpi[0] + "\n" + kpi[1] for kpi in kpis]]
-        t = Table(table_data, colWidths=[1.5*inch]*5, hAlign='CENTER')
-        t.setStyle(TableStyle([
-            ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#1C4D86")),
-            ('TEXTCOLOR', (0,0), (-1,0), colors.white),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-            ('FONTSIZE', (0, 0), (-1, -1), 10),
-            ('INNERGRID', (0, 0), (-1, -1), 0.5, colors.white)
-        ]))
-        story.append(t)
-        story.append(Spacer(1, 12))
 
-        # --- Dicionário de siglas ---
-        sigla_para_estado = {
-            "AC": "Acre", "AL": "Alagoas", "AP": "Amapá", "AM": "Amazonas",
-            "BA": "Bahia", "CE": "Ceará", "DF": "Distrito Federal", "ES": "Espírito Santo",
-            "GO": "Goiás", "MA": "Maranhão", "MT": "Mato Grosso", "MS": "Mato Grosso do Sul",
-            "MG": "Minas Gerais", "PA": "Pará", "PB": "Paraíba", "PR": "Paraná",
-            "PE": "Pernambuco", "PI": "Piauí", "RJ": "Rio de Janeiro", "RN": "Rio Grande do Norte",
-            "RS": "Rio Grande do Sul", "RO": "Rondônia", "RR": "Roraima", "SC": "Santa Catarina",
-            "SP": "São Paulo", "SE": "Sergipe", "TO": "Tocantins"
-        }
+        for titulo, texto_base, caminho_img, linhas_dinamicas in secoes:
 
-        # --- Definir df_filtrado para os markdowns ---
-        df_filtrado = df.copy()  # ou aplique filtros que você usa
+            story.append(Spacer(1, 18))
+            story.append(Paragraph(f"<b>{titulo}</b>", styles["Heading2"]))
+            story.append(Spacer(1, 8))
 
-        # --- Funções para gerar markdowns ---
-        def gerar_markdown_empregos(df):
-            df_uf = df.groupby("Estado", as_index=False)["Empregos"].sum()
-            markdown = ""
-            for _, row in df_uf.iterrows():
-                estado = sigla_para_estado.get(row["Estado"], row["Estado"])
-                empregos = f"{int(row['Empregos']):,}".replace(",", ".")
-                markdown += f"Em {estado} foram gerados cerca de {empregos} empregos.\n"
-            return markdown
+            img = Image(caminho_img)
+            img.drawWidth = 5 * inch
+            img.drawHeight = img.imageHeight * 5 * inch / img.imageWidth
+            story.append(img)
 
-        def gerar_markdown_estabelecimentos(df):
-            df_uf = df.groupby("Estado", as_index=False)["Estabelecimentos"].sum()
-            markdown = ""
-            for _, row in df_uf.iterrows():
-                estado = sigla_para_estado.get(row["Estado"], row["Estado"])
-                estabe = f"{int(row['Estabelecimentos']):,}".replace(",", ".")
-                markdown += f"Em {estado} contabilizam-se aproximadamente {estabe} estabelecimentos turísticos.\n"
-            return markdown
+            os.unlink(caminho_img)
 
-        def gerar_markdown_visitas(df):
-            df_visitas = df.groupby("Estado", as_index=False)[["Visitas Nacionais","Visitas Internacionais"]].sum()
-            markdown = ""
-            for _, row in df_visitas.iterrows():
-                estado = sigla_para_estado.get(row["Estado"], row["Estado"])
-                nac = f"{int(row['Visitas Nacionais']):,}".replace(",", ".")
-                intl = f"{int(row['Visitas Internacionais']):,}".replace(",", ".")
-                markdown += f"Em {estado} contabilizaram-se {nac} visitas nacionais e {intl} visitas internacionais.\n"
-            return markdown
+            story.append(Spacer(1, 10))
+            story.append(Paragraph(texto_base, styles["Normal"]))
+            story.append(Spacer(1, 6))
 
-        def gerar_markdown_arrecadacao(df):
-            df_arrec = df.groupby("Estado", as_index=False)["Arrecadação"].sum()
-            markdown = ""
-            for _, row in df_arrec.iterrows():
-                estado = sigla_para_estado.get(row["Estado"], row["Estado"])
-                valor = f"R$ {row['Arrecadação']:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
-                markdown += f"No estado de {estado}, a arrecadação foi de aproximadamente {valor}.\n"
-            return markdown
+            for linha in linhas_dinamicas:
+                story.append(Paragraph(linha, styles["Normal"]))
 
-        # --- Gerar markdowns antes de inserir ---
-        markdown_empregos = gerar_markdown_empregos(df_filtrado)
-        markdown_estabelecimentos = gerar_markdown_estabelecimentos(df_filtrado)
-        markdown_visitas = gerar_markdown_visitas(df_filtrado)
-        markdown_arrecadacao = gerar_markdown_arrecadacao(df_filtrado)
-
-        # --- Função para salvar gráfico e inserir ---
-        def salvar_e_inserir(fig, titulo, descricao, markdown_dinamico=None):
-            story.append(Paragraph(f"<b>{titulo}</b>", ParagraphStyle(
-                name="TituloMenor", fontSize=14, leading=16, textColor=colors.black, spaceAfter=10
-            )))
-            try:
-                tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
-                fig.write_image(tmp.name, scale=2)
-                img = Image(tmp.name)
-                img.drawWidth = 5*inch
-                img.drawHeight = img.imageHeight * 5*inch / img.imageWidth
-                story.append(img)
-                story.append(Spacer(1, 12))
-                tmp.close()
-                os.unlink(tmp.name)
-            except Exception as e:
-                story.append(Paragraph(f"Erro ao salvar gráfico: {e}", styles["Normal"]))
-
-            if descricao:
-                story.append(Paragraph(descricao, styles["Normal"]))
-                story.append(Spacer(1, 12))
-
-            if markdown_dinamico:
-                for linha in markdown_dinamico.split("\n"):
-                    if linha.strip():
-                        linha_formatada = linha.replace("**", "")
-                        story.append(Paragraph(linha_formatada, styles["Normal"]))
-                story.append(Spacer(1, 14))
-
-        # --- Inserir gráficos + markdowns ---
-        salvar_e_inserir(fig_barras, "Quantidade de empregos por Estado", texto_emp, markdown_empregos)
-        salvar_e_inserir(fig_barras_02, "Quantidade de estabelecimentos turísticos por Estado", texto_est, markdown_estabelecimentos)
-        salvar_e_inserir(fig_barrasVisitas, "Comparação entre visitas nacionais e internacionais", texto_vis, markdown_visitas)
-        salvar_e_inserir(fig_linhas, "Evolução da arrecadação turística", texto_arr, markdown_arrecadacao)
-
-        # --- Gerar PDF ---
+        # ---------------- GERAR PDF ----------------
         tmp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
         doc = SimpleDocTemplate(tmp_pdf.name, pagesize=A4)
         doc.build(story)
@@ -645,18 +622,13 @@ Este relatório apresenta gráficos e análises detalhadas para apoiar decisões
             pdf_bytes = f.read()
 
         st.success("PDF gerado com sucesso!")
+
         st.download_button(
             "⬇️ Baixar PDF",
             pdf_bytes,
             file_name=f"relatorio_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
             mime="application/pdf"
         )
-
-
-
-
-
-
 
 
 
