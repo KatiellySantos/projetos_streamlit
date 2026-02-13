@@ -573,7 +573,7 @@ fluxo de visitantes e arrecadação turística.
             fig, ax = plt.subplots(figsize=(2,2))
             ax.plot(df_uf["Estado"], df_uf[coluna], marker="o")
             ax.set_title(titulo)
-            plt.xticks(rotation=45)
+            plt.xticks(rotation=10)
 
             tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
             plt.tight_layout()
