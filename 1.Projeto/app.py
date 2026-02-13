@@ -636,7 +636,11 @@ Este relatório apresenta gráficos e análises detalhadas para apoiar decisões
                          texto_arr, markdown_arrecadacao)
 
         # ----- Logo e assinatura -----
-        logo_final = Image("logo.png", width=60, height=60)
+
+        logo_path = os.path.join(BASE_DIR, "logo.png")
+
+        if os.path.exists(logo_path):
+        logo_final = Image(logo_path, width=60, height=60)
         assinatura = Table([[ '', logo_final ]], colWidths=[400, 60])
         assinatura.setStyle(TableStyle([
             ('VALIGN', (0, 0), (-1, -1), 'BOTTOM'),
