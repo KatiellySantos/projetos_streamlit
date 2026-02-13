@@ -538,7 +538,7 @@ fluxo de visitantes e arrecadação turística.
                 ["Visitas Nacionais","Visitas Internacionais"]
             ].sum()
 
-            fig, ax = plt.subplots(figsize=(1,1))
+            fig, ax = plt.subplots(figsize=(6,4))
             x = range(len(df_uf))
 
             ax.bar(x, df_uf["Visitas Nacionais"], width=0.4, label="Nacionais")
@@ -573,9 +573,9 @@ fluxo de visitantes e arrecadação turística.
 
         # ---------------- SEÇÕES DO RELATÓRIO ----------------
         secoes = [
-            ("",
+            ("Quantidade de empregos por Estado",
              texto_emp,
-             grafico_barra(df_filtrado, "Empregos", "Quantidade de empregos por Estado"),
+             grafico_barra(df_filtrado, "Empregos", ""),
              texto_dinamico(df_filtrado, "Empregos", "O estado de")),
 
             ("Quantidade de estabelecimentos turísticos por Estado",
@@ -601,8 +601,8 @@ fluxo de visitantes e arrecadação turística.
             story.append(Spacer(1, 8))
 
             img = Image(caminho_img)
-            img.drawWidth = 5 * inch
-            img.drawHeight = img.imageHeight * 5 * inch / img.imageWidth
+            img.drawWidth = 3 * inch
+            img.drawHeight = img.imageHeight * 3 * inch / img.imageWidth
             story.append(img)
 
             os.unlink(caminho_img)
