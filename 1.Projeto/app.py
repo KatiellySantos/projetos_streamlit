@@ -601,7 +601,7 @@ fluxo de visitantes e arrecadação turística.
             story.append(Spacer(1, 8))
 
             img = Image(caminho_img)
-            img.drawWidth = 5 * inch
+            img.drawWidth = 3 * inch
             img.drawHeight = img.imageHeight * 5 * inch / img.imageWidth
             story.append(img)
 
