@@ -1,5 +1,5 @@
 # ============================
-# app.py — Painel + Relatório PDF (final)
+# app.py — Painel + Relatório PDF
 # ============================
 
 # ---------- IMPORTS ----------
@@ -9,6 +9,7 @@ import plotly.express as px
 import plotly.io as pio
 import json
 from datetime import datetime
+from zoneinfo import ZoneInfo
 import tempfile
 import os
 
@@ -484,7 +485,8 @@ with tab3:
             "<b>Painel de Desenvolvimento Econômico e Turístico</b>",
             styles["Title"]
         ))
-
+        
+        agora = datetime.now(ZoneInfo("America/Sao_Paulo"))
         data_formatada = datetime.now().strftime("%d/%m/%Y %H:%M")
         styles.add(ParagraphStyle(
             name="DataDireita",
