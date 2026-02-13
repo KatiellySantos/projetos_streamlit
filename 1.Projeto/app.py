@@ -610,7 +610,7 @@ fluxo de visitantes e arrecadação turística.
             story.append(Spacer(1, 10))
 
             # Tamanho fixo controlado aqui
-            img = Image(caminho_img, width=450, height=260)
+            img = Image(caminho_img, width=300, height=260)
             story.append(img)
 
             os.unlink(caminho_img)
