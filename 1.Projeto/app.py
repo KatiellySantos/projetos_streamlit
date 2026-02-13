@@ -487,7 +487,7 @@ with tab3:
         ))
         
         agora = datetime.now(ZoneInfo("America/Sao_Paulo"))
-        data_formatada = datetime.now().strftime("%d/%m/%Y %H:%M")
+        data_formatada = agora.strftime("%d/%m/%Y %H:%M")
         styles.add(ParagraphStyle(
             name="DataDireita",
             parent=styles["Normal"],
