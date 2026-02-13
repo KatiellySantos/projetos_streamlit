@@ -567,14 +567,14 @@ fluxo de visitantes e arrecadação turística.
         def grafico_linha(df, coluna, titulo):
             df_uf = df.groupby("Estado", as_index=False)[coluna].sum()
 
-            fig, ax = plt.subplots(figsize=(4,2))
+            fig, ax = plt.subplots(figsize=(2,2))
             ax.plot(df_uf["Estado"], df_uf[coluna], marker="o")
             ax.set_title(titulo)
             plt.xticks(rotation=45)
 
             tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
             plt.tight_layout()
-            plt.savefig(tmp.name, dpi=60)
+            plt.savefig(tmp.name, dpi=20)
             plt.close(fig)
 
             return tmp.name
@@ -610,7 +610,7 @@ fluxo de visitantes e arrecadação turística.
             story.append(Spacer(1, 10))
 
             # Tamanho fixo controlado aqui
-            img = Image(caminho_img, width=150, height=80)
+            img = Image(caminho_img, width=80, height=80)
             story.append(img)
 
             os.unlink(caminho_img)
