@@ -473,7 +473,8 @@ with tab3:
         story = []  # story definido aqui, dentro do if
 
         # ----- TÍTULO PDF -----
-        ibge_path = os.path.join(BASE_DIR, "IBGE.PNG")
+        
+    ibge_path = os.path.join(BASE_DIR, "IBGE.PNG")
         if os.path.exists(ibge_path):
             logo = Image(ibge_path, width=60, height=60)
             story.append(logo)
