@@ -614,7 +614,7 @@ Este relatório apresenta gráficos e análises detalhadas para apoiar decisões
         # ----- Função para salvar gráfico e inserir markdown (MATPLOTLIB, sem Kaleido) -----
         import matplotlib.pyplot as plt
         import numpy as np
-
+        
         def salvar_e_inserir(fig, titulo, descricao, markdown_dinamico=None):
             story.append(Paragraph(f"<b>{titulo}</b>", titulo_menor))
             try:
@@ -624,37 +624,70 @@ Este relatório apresenta gráficos e análises detalhadas para apoiar decisões
                 # Detecta tipo de gráfico Plotly
                 if len(fig.data) == 1:
                     trace = fig.data[0]
+
                     if trace.type == "scatter":
                         plt.plot(trace.x, trace.y, marker='o')
+
                     elif trace.type == "bar":
-                        plt.bar(trace.x, trace.y)
+                        # Verifica se é horizontal
+                        if hasattr(trace, "orientation") and trace.orientation == "h":
+                            plt.barh(trace.y, trace.x)
+                        else:
+                            plt.bar(trace.x, trace.y)
+
                 elif len(fig.data) == 2:
                     trace1 = fig.data[0]
                     trace2 = fig.data[1]
-                    x = trace1.x
-                    y1 = trace1.y
-                    y2 = trace2.y
+
                     largura = 0.35
-                    pos = np.arange(len(x))
-                    plt.bar(pos - largura/2, y1, largura, label=trace1.name if trace1.name else "")
-                    plt.bar(pos + largura/2, y2, largura, label=trace2.name if trace2.name else "")
-                    plt.xticks(pos, x)
-                    plt.legend()
 
-                plt.xticks(rotation=45)
-                plt.tight_layout()
-                plt.savefig(tmp.name, dpi=300)
-                plt.close()
+                    # Se for gráfico horizontal (caso do gráfico de visitas)
+                    if hasattr(trace1, "orientation") and trace1.orientation == "h":
+                        categorias = trace1.y
+                        pos = np.arange(len(categorias))
 
-                story.append(Image(tmp.name, width=5*inch, height=3.5*inch))
-                story.append(Spacer(1, 6))
+                        plt.barh(pos - largura/2, trace1.x, largura,
+                                 label=trace1.name if trace1.name else "")
+                        plt.barh(pos + largura/2, trace2.x, largura,
+                                 label=trace2.name if trace2.name else "")
 
-            except Exception as e:
-                story.append(Paragraph(f"Erro ao gerar gráfico: {e}", styles["Normal"]))
+                        plt.yticks(pos, categorias)
 
-            if descricao:
-                story.append(Paragraph(descricao, styles["Normal"]))
-                story.append(Spacer(1, 6))
+                   # Caso seja vertical (empregos e estabelecimentos)
+                   else:
+                       categorias = trace1.x
+                       pos = np.arange(len(categorias))
+
+                       plt.bar(pos - largura/2, trace1.y, largura,
+                               label=trace1.name if trace1.name else "")
+                       plt.bar(pos + largura/2, trace2.y, largura,
+                               label=trace2.name if trace2.name else "")
+
+                       plt.xticks(pos, categorias)
+
+                     plt.legend()
+
+                 plt.xticks(rotation=45)
+                 plt.tight_layout()
+                 plt.savefig(tmp.name, dpi=300)
+                 plt.close()
+
+                 story.append(Image(tmp.name, width=5*inch, height=3.5*inch))
+                 story.append(Spacer(1, 6))
+
+             except Exception as e:
+                 story.append(Paragraph(f"Erro ao gerar gráfico: {e}", styles["Normal"]))
+
+             if descricao:
+                 story.append(Paragraph(descricao, styles["Normal"]))
+                 story.append(Spacer(1, 6))
+
+
+        
+
+        
+
+
 
             if markdown_dinamico:
                 for linha in markdown_dinamico.split("\n"):
