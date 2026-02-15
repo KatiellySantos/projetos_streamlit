@@ -674,17 +674,8 @@ Este relatório apresenta gráficos e análises detalhadas para apoiar decisões
                                  label="Visitas Internacionais", color="#F5A623")
 
                         plt.yticks(pos, categorias)
-
-                        
-                        categorias = trace1.y
-                        pos = np.arange(len(categorias))
-
-                        plt.barh(pos - largura/2, trace1.x, largura,
-                                 label=trace1.name if trace1.name else "")
-                        plt.barh(pos + largura/2, trace2.x, largura,
-                                 label=trace2.name if trace2.name else "")
-
-                        plt.yticks(pos, categorias)
+                        plt.gca().invert_yaxis()
+                    
 
                    # Caso seja vertical (empregos e estabelecimentos)
                     else:
