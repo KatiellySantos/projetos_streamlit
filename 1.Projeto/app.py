@@ -130,8 +130,6 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-logo_path = os.path.join(BASE_DIR, ".png")
-st.sidebar.image(logo_path, use_container_width=True)
 
 # ---------- BARRA LATERAL ----------
 
@@ -154,7 +152,15 @@ df_filtrado = df[
 ].copy()
 
 logo_path = os.path.join(BASE_DIR, ".png")
-st.sidebar.image(logo_path, use_container_width=True)
+#st.sidebar.image(logo_path, use_container_width=True)
+st.sidebar.markdown(
+    f"""
+    <div style="text-align: center; margin-top: 10px;">
+        <img src="{logo_path}" width="120">
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 # ---------- FUNÇÃO KPI ----------
 
