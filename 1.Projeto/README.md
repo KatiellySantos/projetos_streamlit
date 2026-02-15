@@ -6,7 +6,7 @@ O sistema permite explorar dados por Estado, Município e Região Turística, of
 
 ---
 
-🎯 Objetivo
+## 🎯 Objetivo
 Disponibilizar uma visualização estruturada dos principais indicadores do turismo brasileiro, permitindo:
 - Análise comparativa entre Estados
 - Visualização geográfica por município
