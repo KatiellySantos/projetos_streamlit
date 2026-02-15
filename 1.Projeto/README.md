@@ -31,10 +31,10 @@ Disponibilizar uma visualização estruturada dos principais indicadores do turi
 - Matplotlib
 
 📂 Estrutura do Projeto
-      📁 projeto
-      │-- app.py
-      │-- planilha.xlsx
-      │-- mapa.json
-      │-- logo.png
-      │-- IBGE.png
+         📁 projeto
+         │-- app.py
+         │-- planilha.xlsx
+         │-- mapa.json
+         │-- logo.png
+         │-- IBGE.png
 
