@@ -130,7 +130,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-logo_path = os.path.join(BASE_DIR, "logo.png")
+logo_path = os.path.join(BASE_DIR, ".png")
 st.sidebar.image(logo_path, use_container_width=True)
 
 # ---------- BARRA LATERAL ----------
@@ -152,6 +152,9 @@ df_filtrado = df[
     (df["Município"].isin(se_municipio)) &
     (df["Região Turística"].isin(se_turismo))
 ].copy()
+
+logo_path = os.path.join(BASE_DIR, ".png")
+st.sidebar.image(logo_path, use_container_width=True)
 
 # ---------- FUNÇÃO KPI ----------
 
