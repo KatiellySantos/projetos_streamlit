@@ -466,9 +466,6 @@ with tab2:
 # TAB 3 — RELATÓRIO PDF
 # ------------------------------------------------------------
 
-# ------------------------------------------------------------
-# TAB 3 — RELATÓRIO PDF
-# ------------------------------------------------------------
 with tab3:
     st.subheader("Gerar Relatório")
     gerar = st.button("📄 Gerar Relatório em PDF")
@@ -558,7 +555,7 @@ Este relatório apresenta gráficos e análises detalhadas para apoiar decisões
             "RS": "Rio Grande do Sul", "RO": "Rondônia", "RR": "Roraima", "SC": "Santa Catarina",
             "SP": "São Paulo", "SE": "Sergipe", "TO": "Tocantins"
         }
-
+        
         # ----- Funções para gerar markdowns -----
         def gerar_markdown_empregos(df):
             df_uf = df.groupby("Estado", as_index=False)["Empregos"].sum()
@@ -682,7 +679,6 @@ Este relatório apresenta gráficos e análises detalhadas para apoiar decisões
                         plt.yticks(pos, categorias)
                         plt.gca().invert_yaxis()
                     
-
                    # Caso seja vertical (empregos e estabelecimentos)
                     else:
                         categorias = trace1.x
@@ -711,13 +707,6 @@ Este relatório apresenta gráficos e análises detalhadas para apoiar decisões
             if descricao:
                 story.append(Paragraph(descricao, styles["Normal"]))
                 story.append(Spacer(1, 6))
-
-
-        
-
-        
-
-
 
             if markdown_dinamico:
                 for linha in markdown_dinamico.split("\n"):
@@ -765,14 +754,6 @@ Este relatório apresenta gráficos e análises detalhadas para apoiar decisões
             file_name=f"relatorio_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf",
             mime="application/pdf"
         )
-
-
-
-
-
-
-
-
 
 # ------------------------------------------------------------
 # Estilo do Dashboard
