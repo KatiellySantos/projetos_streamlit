@@ -131,6 +131,10 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+st.sidebar.markdown("---")
+st.sidebar.image(".png", use_container_width=True)
+
+
 # ---------- BARRA LATERAL ----------
 
 estado = sorted(df["Estado"].unique())
