@@ -154,7 +154,7 @@ df_filtrado = df[
 logo_path = os.path.join(BASE_DIR, ".png")
 col1, col2 = st.sidebar.columns([1,2])
 
-with col2:
+with col1:
     st.image(logo_path, width=120)
 
 # ---------- FUNÇÃO KPI ----------
