@@ -25,7 +25,14 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.enums import TA_RIGHT
 from reportlab.platypus import PageBreak
 
-st.set_page_config(layout="wide")
+# ------------------------------------------------------------
+# CONFIGURAÇÃO DA PÁGINA
+# ------------------------------------------------------------
+
+st.set_page_config(
+    page_title="Painel de Estimativas Populacionais",
+    page_icon=".png",
+    layout="wide")
 
 # ------------------------------------------------------------
 # LEITURA E CARREGAMENTO DOS DADOS
